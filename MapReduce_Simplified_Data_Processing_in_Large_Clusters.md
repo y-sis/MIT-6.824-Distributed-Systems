@@ -37,7 +37,8 @@ PASS!
 ## 3 Implementation
 
 ### 3.1 Execution Overview
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/68cc8f06-db18-4b36-af9e-25f5cf36fc22/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/68cc8f06-db18-4b36-af9e-25f5cf36fc22/Untitled.png) 
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/68cc8f06-db18-4b36-af9e-25f5cf36fc22/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/68cc8f06-db18-4b36-af9e-25f5cf36fc22/Untitled.png) ![image](https://user-images.githubusercontent.com/26767193/113543757-02811300-9622-11eb-8422-7ca6c671aee4.png)
+
 
 ### 3.2 Master Data Structures
 Master는 각각의 Map Task와 Reduce Task에 대해 그 Task의 상태(idle, in-progress, completed)와, (할당이 완료된 Task에 한하여)  Worker Machine의 ID 정보를 가진다.
@@ -74,7 +75,8 @@ Consider map task M and reduce tasks R1 and R2. Let e(Ri) be the execution of Ri
 
 엄청 중요하다기보다 문단이 잘 이해가 안 가서 원문 +  제 생각을 표현한 그림(...) 으로 대체합니당..
 
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/7be65b66-3145-44ac-86ae-cdc9e11ed492/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/7be65b66-3145-44ac-86ae-cdc9e11ed492/Untitled.png)
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/7be65b66-3145-44ac-86ae-cdc9e11ed492/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/7be65b66-3145-44ac-86ae-cdc9e11ed492/Untitled.png)![image](https://user-images.githubusercontent.com/26767193/113543828-26dcef80-9622-11eb-8ab6-f32574f99d2f.png)
+
 
 ※ deterministic function: 특정 입력 값 집합으로 호출될 때마다 항상 동일한 결과를 반환하는 함수
 
@@ -150,7 +152,8 @@ Master는 내부에서 HTTP 서버를 실행하고 사용자가 활용할 수 �
 
 ## 5 Performance / 6 Experience / 7 Related Work
 
-5장에서는 문자열의 특정한 패턴을 찾는 grep과 정렬을 MapReduce로 실행해본 결과를 보여주고, 6장에서는 실제 구글에서 어떻게 MapReduce를 활용했는지 소개하고 있다. 7장은 MapReduce의 동작 방식과 관련하여 더 읽어볼만한 거리들을 소개하고 있는데, 셋 다 그냥 패스하도록 하겠다. ㅎㅎㅎㅎ
+5장에서는 문자열의 특정한 패턴을 찾는 grep과 정렬을 MapReduce로 실행해본 결과를 보여주고, 6장에서는 실제 구글에서 어떻게 MapReduce를 활용했는지 소개하고 있다. 
+7장은 MapReduce의 동작 방식과 관련하여 더 읽어볼만한 거리들을 소개하고 있다. 
 
 ## 8 Conclusions
 
@@ -167,7 +170,8 @@ MapReduce는 구글에서 성공적으로 사용되고 있다. 그 이유를 꼽
     - 따라서 **네트워크를 타고 전송되는 데이터의 양이 최소화** 되도록 노력했고, 이 때문에 Map Task가 로컬 디스크에서 데이터를 읽어 들여서, 중간 결과물도 로컬 디스크에 저장하도록 구현했다.
 3. 느린 기계의 영향력을 줄이고, 장애와 데이터 손실을 처리하는 데에 **중복 실행**을 사용할 수 있다.
 
-논문 끗!
+
+
 
 # Lecture Question
 
