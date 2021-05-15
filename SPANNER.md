@@ -1,10 +1,5 @@
 # L13: Spanner
 
-논문: https://pdos.csail.mit.edu/6.824/papers/spanner.pdf
-담당자: Taemin Park
-블로그 작성 기한: May 2, 2021
-일정: Apr 25, 2021
-
 ## Spanner
 
 ### 등장 배경
@@ -22,7 +17,7 @@ Spanner는 완전 관리형 그리고 관계형(semi-관계형) 데이터베이�
 - Externally consistent 한 트랜잭션을 지원한다.
   - 글로벌 스케일로 데이터를 분산하며 externally consistent 한 분산 트랜잭션을 지원하는 첫 시스템이다.
 
-아래는 GCP에서 사용할 데이터베이스를 고를 때 참고할만한 의사결정 나무이다. 
+아래는 GCP에서 사용할 데이터베이스를 고를 때 참고할만한 의사결정 나무이다.
 
 ![00.png](./images/spanner/00.png)
 
@@ -55,7 +50,7 @@ Spanner는 전 세계에 분산되어 있는 데이터베이스로 여러 가지
 
 Spanner는 여러 개의 존(zone)들의 집합으로 구성된다. 각 존은 관리 상의 배포 단위이다. 존은 또한 데이터를 복제할 수 있는 위치들의 모음이기도 하다. 존은 새로운 데이터 센터가 추가되고 빠짐에 따라 운영되고 있는 시스템에서 추가되거나 제거될 수 있다. 존은 또한 물리적 격리(isolation)의 단위이기도 하다. 하나의 데이터 센터 안에 한 개 이상의 존이 있을 수 있다. 예를 들어 다른 어플리케이션의 데이터는 같은 데이터센터라고 하더라도 반드시 다른 서버 군에 파티셔닝 되어야 한다.
 
-* 존은 AWS의 AZ 비슷한 개념인 것 같다. 그런데 하나의 데이터센터에 여러 개의 존이 있을 수 있다고 말하는 걸로 보아 완전히 같은 개념은 아닌 것 같다.
+- 존은 AWS의 AZ 비슷한 개념인 것 같다. 그런데 하나의 데이터센터에 여러 개의 존이 있을 수 있다고 말하는 걸로 보아 완전히 같은 개념은 아닌 것 같다.
 
 ![01.png](./images/spanner/01.png))
 
@@ -71,19 +66,19 @@ Spanner는 Bigtable을 베이스로 해서 구현 되었다. 여기서는 Bigtab
 
 Tablet의 상태는 B-tree와 유사한 파일 셋과 write-ahead log에 저장되며 모두 Colossus에 저장된다.
 
-* Colossus는 분산 파일 시스템으로 GFS의 후속 버전이다. 매우 큰 규모의 데이터베이스에서는 매우 고성능의 파일 시스템이 필요하다. Colossus는 BigTable 팀에서 부터 시작되었고 BigTable 또한 Colossus로 부터 구현되었다. 그래서 Spanner 또한 Colossus 를 파일 시스템으로 사용한다.
+- Colossus는 분산 파일 시스템으로 GFS의 후속 버전이다. 매우 큰 규모의 데이터베이스에서는 매우 고성능의 파일 시스템이 필요하다. Colossus는 BigTable 팀에서 부터 시작되었고 BigTable 또한 Colossus로 부터 구현되었다. 그래서 Spanner 또한 Colossus 를 파일 시스템으로 사용한다.
 
 복제를 지원하기 위해 각 spanserver는 각 태블릿 위에 단일 paxos state machine을 구현한다. 각 state machine는 그것의 메타데이터와 로그를 그에 해당되는 tablet에 저장한다. Spanner의 paxos 구현은 time-based leader lease와 함께 long-lived leader를 지원한다. Lease의 디폴트 값은 10초이다. (~~현재 Spanner의 구현은 모든 paxos의 write를 두 번씩 기록한다. 한 번은 tablet의 log에 기록하고 다른 한 번은 paxos의 로그에 기록한다. 이 구현은 편의를 위한 것으로 차차 해결될 것이다~~). Paxos의 구현은 파이프라이닝 되어 있으므로 네트워크 지연(WAN latencies)가 있을 경우 Spanner의 쓰루풋을 향상시킬 수 있다. 그러나 Paxos에서 write는 순서대로 일어난다.
 
 Paxos state machine은 지속적으로 복제되는 bag of mappings을 구현하기 위해 사용된다. 각 복제의 key-value 매핑 상태는 그에 해당되는 tablet에 저장된다. Write는 반드시 Paxos protocol을 반드시 리더에서 시작해야 한다. Read는 충분히 최신인 복제본에서 상태에 직접 접근한다. Replica의 세트가 Paxos group이다.
 
-* 뒤에서 예를 통해 조금 더 자세히 살펴볼 것
+- 뒤에서 예를 통해 조금 더 자세히 살펴볼 것
 
 리더인 모든 레플리카에서 각 spanserver는 동시성 제어의 구현을 위해 lock table을 구현한다. lock table는 [two-phase locking](https://itwiki.kr/w/2%EB%8B%A8%EA%B3%84_%EB%A1%9C%ED%82%B9_%EA%B7%9C%EC%95%BD)을 위한 상태를 저장한다: 잠금 상태의 키 범위를 매핑한다. 동기화를 필요로 하는 연산들(예를 들어 transactional한 읽기)는 lock table에서 lock을 얻고 진행한다. 그렇지 않은 경우는 lock table을 bypass 한다.
 
 리더인 모든 레플리카에서 각 spanserver는 분산 트랜잭션을 지원하기 위해 트랜잭션 매니저를 구현한다. 트랜잭션 매니저는 파티션 리더를 구현하기 위해서도 사용된다. 만약 트랜잭션이 한 개의 paxos group 과만 연관 된다면 트랜잭션 매니저를 bypass 할 수 있다. 그러나 만약 트랜잭션이 두 개 이상의 paxos group과 연관 된다면 two phase commit을 조정하기 위해 두 그룹의 리더들은 조정해야 한다. 파티션 그룹 중 하나가 조정자(coordinator)가 된다.
 
-* 뒤에서 예를 통해 조금 더 자세히 살펴볼 것 
+- 뒤에서 예를 통해 조금 더 자세히 살펴볼 것
 
 #### Directories and Placement
 
@@ -114,7 +109,7 @@ Spanner가 제공하는 데이터 모델의 특징은 다음과 같다.
 
 Spanner의 데이터 모델은 각 행에 이름이 있어야 한다는 점에서 완전히 관계형은 아니다. 더 정확히 말하면 모든 테이블에 하나 이상의 PK 컬럼의 순서를 지정할 수 있는 집합이 있어야 한다. 이러한 요구사항 때문에 Spanner는 여전히 key-value store 처럼 보이는 측면이 있다.
 
-* 데이터 모델의 예
+- 데이터 모델의 예
 
 ![03.png](./images/spanner/03.png))
 
@@ -124,7 +119,7 @@ Spanner의 데이터 모델은 각 행에 이름이 있어야 한다는 점에�
 
 ### TrueTime
 
-**TrueTime API를 위한 물리적 구성**
+#### TrueTime API를 위한 물리적 구성
 
 ![04.png](./images/spanner/04.png)
 
@@ -134,7 +129,7 @@ Spanner는 여러 데이터센터에 퍼져 있는 노드 간에 시간을 동�
 
 ![05.png](./images/spanner/05.png)
 
-**TrueTime API**
+#### TrueTime API
 
 ![06.png](./images/spanner/06.png)
 
