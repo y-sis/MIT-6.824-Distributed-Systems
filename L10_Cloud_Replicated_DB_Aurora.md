@@ -29,7 +29,9 @@ Models; Replication; Recovery; Performance; OLTP
 # 2. DURABILITY AT SCALE
 
 _Durability_: _the ability to withstand wear, pressure, or damage._
+
 _Database가 단 한가지 역할을 해야 한다면, 결국 한번 쓰여진 데이터는 읽혀야 한다는 것이다._
+
 **_Quorum Model + Segment Storage → Durability_**
 
 ## 2.1 Replication and Correlated Failures
@@ -41,27 +43,26 @@ _Database가 단 한가지 역할을 해야 한다면, 결국 한번 쓰여진 �
   - 고객이 (컴퓨팅 레벨에서의 로직이) 성공하더라도 storage 레벨에서 실패할 수 있기 때문에 failure에 resilent 한 구조여야 한다.
     - node - background noise 계속 발생 : network, disk 실패 등에서 어떻게 자유로울 수 있을까?
 
-**Quorum-based Voting Protocol**
+**_Quorum-based Voting Protocol_**
+- [Quorum (Wikipedia)](<https://en.wikipedia.org/wiki/Quorum_(distributed_computing)>)
 
-[https://en.wikipedia.org/wiki/Quorum\_(distributed_computing)](<https://en.wikipedia.org/wiki/Quorum_(distributed_computing)>)
+- A quorum is the minimum number of votes that a distributed transaction has to obtain in order to be allowed to perform an operation in a distributed system.
 
-A quorum is the minimum number of votes that a distributed transaction has to obtain in order to be allowed to perform an operation in a distributed system.
+  - `V` : copies of a a replicated data
+  - `Vr` : a read quorum
+  - `Vw` : a write quorum
 
-- `V` : copies of a a replicated data
-- `Vr` : a read quorum
-- `Vw` : a write quorum
+- **To acheive consistency, 2 rules!**
 
-**To acheive consistency, 2 rules!**
+  - 1. `Vr + Vw > V`
 
-1. `Vr + Vw > V`
+    - each read must be aware of the most recent write
+    - `len([1, 2, 3]) + len([3, 4, 5]) > len([1, 2, 3, 4, 5])`
+      - 3이라는 교집합이 존재해야 한다는 의미!
 
-- each read must be aware of the most recent write
-- `len([1, 2, 3]) + len([3, 4, 5]) > len([1, 2, 3, 4, 5])`
-  - 3이라는 교집합이 존재해야 한다는 의미!
+  - 2. `Vw > V/2`
 
-2. `Vw > V/2`
-
-- each write must be aware of the most recent write → avoid conflict!
+    - each write must be aware of the most recent write → avoid conflict!
 
 (교수님: Quorum 시스템은 version number 가 있어서 어떤게 최신인지 파악할 수 있어야 한다. 어떤게 최신인지 파악하기 쉽게하려고..! 그리고 Quorum을 쓰면 제일 빠른 서버들의 응답을 보면 되기 때문에 갑자기 느려지거나 망가진 서버를 기다리지 않아도 됨. R = 1, W = 3 로 설정하면 read 가 빠름 하지만 W는 느리고, not fault-tolerant)
 
